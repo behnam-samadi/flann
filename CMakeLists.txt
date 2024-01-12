@@ -13,6 +13,8 @@ DISSECT_VERSION()
 GET_OS_INFO()
 ENABLE_TESTING()
 
+find_library(LZ4_LIBRARIES NAMES liblz4.so HINTS "lz4/lib")
+link_libraries(${LZ4_LIBRARIES})
 
 # detect if using the Clang compiler
 if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")

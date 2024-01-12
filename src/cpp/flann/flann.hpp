@@ -239,6 +239,7 @@ public:
                                  size_t knn,
                            const SearchParams& params) const
     {
+        std::cout<<"first4 type (search level)";
     	return nnIndex_->knnSearch(queries, indices, dists, knn, params);
     }
 
@@ -257,6 +258,7 @@ public:
                                  size_t knn,
                            const SearchParams& params) const
     {
+        std::cout<<"second3 type";
     	return nnIndex_->knnSearch(queries, indices, dists, knn, params);
     }
 
@@ -274,6 +276,7 @@ public:
                                  size_t knn,
                            const SearchParams& params) const
     {
+        std::cout<<"third type";
     	return nnIndex_->knnSearch(queries, indices, dists, knn, params);
     }
 
@@ -292,6 +295,7 @@ public:
                                  size_t knn,
                            const SearchParams& params) const
     {
+        std::cout<<"fourth type";
     	return nnIndex_->knnSearch(queries, indices, dists, knn, params);
     }
 

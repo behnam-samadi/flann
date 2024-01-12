@@ -298,18 +298,31 @@ public:
      * @param[in] knn Number of nearest neighbors to return
      * @param[in] params Search parameters
      */
-    virtual int knnSearch(const Matrix<ElementType>& queries,
+
+
+    /**
+     *
+     * @param queries
+     * @param indices
+     * @param dists
+     * @param knn
+     * @param params
+     * @return
+     */
+	    virtual int knnSearch(const Matrix<ElementType>& queries,
     		Matrix<size_t>& indices,
     		Matrix<DistanceType>& dists,
     		size_t knn,
     		const SearchParams& params) const
     {
+       //std::cout<<"knnSearch az flann"<<std::endl;
     	assert(queries.cols == veclen());
     	assert(indices.rows >= queries.rows);
     	assert(dists.rows >= queries.rows);
     	assert(indices.cols >= knn);
     	assert(dists.cols >= knn);
     	bool use_heap;
+		int number_of_dis_calcs;
 
     	if (params.use_heap==FLANN_Undefined) {
     		use_heap = (knn>KNN_HEAP_THRESHOLD)?true:false;
@@ -325,8 +338,10 @@ public:
     			KNNResultSet2<DistanceType> resultSet(knn);
 #pragma omp for schedule(static) reduction(+:count)
     			for (int i = 0; i < (int)queries.rows; i++) {
+					number_of_dis_calcs = 0;
     				resultSet.clear();
     				findNeighbors(resultSet, queries[i], params);
+					//std::cout<<std::endl<<"number of dis calcas from nn_index: "<<number_of_dis_calcs<<std::endl;
     				size_t n = std::min(resultSet.size(), knn);
     				resultSet.copy(indices[i], dists[i], n, params.sorted);
     				indices_to_ids(indices[i], indices[i], n);
@@ -351,16 +366,6 @@ public:
     	}
     	return count;
     }
-
-    /**
-     *
-     * @param queries
-     * @param indices
-     * @param dists
-     * @param knn
-     * @param params
-     * @return
-     */
 	virtual int knnSearch(const Matrix<ElementType>& queries,
                                  Matrix<int>& indices,
                                  Matrix<DistanceType>& dists,
@@ -691,6 +696,7 @@ public:
 
 
     virtual void findNeighbors(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams) const = 0;
+	//void findNeighbors_modified(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams, int& number_of_dis_calcs) const = 0;
 
 protected:
 

@@ -44,6 +44,7 @@
 #include "flann/util/allocator.h"
 #include "flann/util/random.h"
 #include "flann/util/saving.h"
+#include "fstream"
 
 namespace flann
 {
@@ -219,17 +220,39 @@ public:
      */
     void findNeighbors(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams) const
     {
+        int number_of_dis_calcs = 0;
         float epsError = 1+searchParams.eps;
-
+        //std::cout<<std::endl<<"Eps: "<<1+searchParams.eps<<std::endl;
         std::vector<DistanceType> dists(veclen_,0);
         DistanceType distsq = computeInitialDistances(vec, dists);
+        //std::cout<<std::endl<<"removed: "<<removed_<<std::endl;
         if (removed_) {
-            searchLevel<true>(result, vec, root_node_, distsq, dists, epsError);
+            searchLevel<true>(result, vec, root_node_, distsq, dists, epsError, number_of_dis_calcs);
         }
         else {
-            searchLevel<false>(result, vec, root_node_, distsq, dists, epsError);
+            searchLevel<false>(result, vec, root_node_, distsq, dists, epsError, number_of_dis_calcs);
         }
+        ofstream file1("/home/ubuntu/Research/results/pcl_stats.txt", ios_base::ate);
+        file1<<std::cout<<endl<<number_of_dis_calcs<<std::endl;
+        file1.close();
+
+        //std::cout<<std::endl<<"Number of distance calculations: "<<number_of_dis_calcs<<std::endl;
     }
+
+
+        void findNeighbors_modified(ResultSet<DistanceType>& result, const ElementType* vec, const SearchParams& searchParams, int& number_of_dis_calcs) const
+    {
+        float epsError = 1+searchParams.eps;
+        //std::cout<<std::endl<<"Eps: "<<1+searchParams.eps<<std::endl;
+        std::vector<DistanceType> dists(veclen_,0);
+        DistanceType distsq = computeInitialDistances(vec, dists);
+        //std::cout<<std::endl<<"removed: "<<removed_<<std::endl;
+        if (removed_) {
+            searchLevel<true>(result, vec, root_node_, distsq, dists, epsError, number_of_dis_calcs);
+        }
+        else {
+            searchLevel<false>(result, vec, root_node_, distsq, dists, epsError, number_of_dis_calcs);
+        }
 
 protected:
 
@@ -591,8 +614,9 @@ private:
      */
     template <bool with_removed>
     void searchLevel(ResultSet<DistanceType>& result_set, const ElementType* vec, const NodePtr node, DistanceType mindistsq,
-                     std::vector<DistanceType>& dists, const float epsError) const
+                     std::vector<DistanceType>& dists, const float epsError, int &number_of_dis_calcs) const
     {
+        //std::cout<<std::endl<<"searchLevel is called"<<std::endl;
         /* If this is a leaf node, then do check and return. */
         if ((node->child1 == NULL)&&(node->child2 == NULL)) {
             DistanceType worst_dist = result_set.worstDist();
@@ -602,6 +626,8 @@ private:
                 }
                 ElementType* point = reorder_ ? data_[i] : points_[vind_[i]];
                 DistanceType dist = distance_(vec, point, veclen_, worst_dist);
+                number_of_dis_calcs++;
+                //std::cout<<std::endl<<"distance_ is called"<<std::endl;
                 if (dist<worst_dist) {
                     result_set.addPoint(dist,vind_[i]);
                 }
@@ -622,21 +648,24 @@ private:
             bestChild = node->child1;
             otherChild = node->child2;
             cut_dist = distance_.accum_dist(val, node->divhigh, idx);
+            //std::cout<<std::endl<<"distance_.accum_dist is called"<<std::endl;
         }
         else {
             bestChild = node->child2;
             otherChild = node->child1;
             cut_dist = distance_.accum_dist( val, node->divlow, idx);
+            //std::cout<<std::endl<<"distance_.accum_dist is called"<<std::endl;
         }
 
         /* Call recursively to search next level down. */
-        searchLevel<with_removed>(result_set, vec, bestChild, mindistsq, dists, epsError);
+        searchLevel<with_removed>(result_set, vec, bestChild, mindistsq, dists, epsError, number_of_dis_calcs);
 
         DistanceType dst = dists[idx];
         mindistsq = mindistsq + cut_dist - dst;
         dists[idx] = cut_dist;
         if (mindistsq*epsError<=result_set.worstDist()) {
-            searchLevel<with_removed>(result_set, vec, otherChild, mindistsq, dists, epsError);
+            //std::cout<<std::endl<<"The is a need to call another branch"<<std::endl;
+            searchLevel<with_removed>(result_set, vec, otherChild, mindistsq, dists, epsError, number_of_dis_calcs);
         }
         dists[idx] = dst;
     }

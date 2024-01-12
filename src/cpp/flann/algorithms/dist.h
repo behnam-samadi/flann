@@ -81,6 +81,7 @@ struct L2_Simple
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType /*worst_dist*/ = -1) const
     {
+        //std::cout<<std::endl<<"operator L2_Simple with size "<<size<<std::endl;
         ResultType result = ResultType();
         ResultType diff;
         for(size_t i = 0; i < size; ++i ) {
@@ -93,6 +94,7 @@ struct L2_Simple
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"L2_Simple"<<std::endl;
         return (a-b)*(a-b);
     }
 };
@@ -122,6 +124,7 @@ struct L2_3D
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"L2_3D"<<std::endl;
         return (a-b)*(a-b);
     }
 };
@@ -149,6 +152,7 @@ struct L2
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
     {
+        //std::cout<<std::endl<<"operator ()"<<std::endl;
         ResultType result = ResultType();
         ResultType diff0, diff1, diff2, diff3;
         Iterator1 last = a + size;
@@ -185,6 +189,7 @@ struct L2
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"L2"<<std::endl;
         return (a-b)*(a-b);
     }
 };
@@ -210,6 +215,7 @@ struct L1
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
     {
+        //std::cout<<std::endl<<"operator () L1"<<std::endl;
         ResultType result = ResultType();
         ResultType diff0, diff1, diff2, diff3;
         Iterator1 last = a + size;
@@ -243,6 +249,7 @@ struct L1
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"L1"<<std::endl;
         return std::abs(a-b);
     }
 };
@@ -273,6 +280,7 @@ struct MinkowskiDistance
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
     {
+        //std::cout<<std::endl<<"operator () Minkowski Distance"<<std::endl;
         ResultType result = ResultType();
         ResultType diff0, diff1, diff2, diff3;
         Iterator1 last = a + size;
@@ -306,6 +314,7 @@ struct MinkowskiDistance
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"Minkowski Distance"<<std::endl;
         return pow(static_cast<ResultType>(std::abs(a-b)),order);
     }
 };
@@ -328,6 +337,7 @@ struct MaxDistance
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
     {
+        //std::cout<<std::endl<<"operator () MaxDistance"<<std::endl;
         ResultType result = ResultType();
         ResultType diff0, diff1, diff2, diff3;
         Iterator1 last = a + size;
@@ -378,6 +388,7 @@ struct HammingLUT
      */
     ResultType operator()(const unsigned char* a, const unsigned char* b, int size) const
     {
+        //std::cout<<std::endl<<"operator () Hamming"<<std::endl;
         ResultType result = 0;
         for (int i = 0; i < size; i++) {
             result += byteBitsLookUp(a[i] ^ b[i]);
@@ -476,6 +487,7 @@ struct HammingPopcnt
     template<typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType /*worst_dist*/ = -1) const
     {
+        //std::cout<<std::endl<<"operator () Hamming Popcnt"<<std::endl;
         ResultType result = 0;
 
         //for portability just use unsigned long -- and use the __builtin_popcountll (see docs for __builtin_popcountll)
@@ -594,6 +606,7 @@ struct HistIntersectionDistance
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType worst_dist = -1) const
     {
+        //std::cout<<std::endl<<"operator () HistIntersectionDistance"<<std::endl;
         ResultType result = ResultType();
         ResultType min0, min1, min2, min3;
         Iterator1 last = a + size;
@@ -648,6 +661,7 @@ struct HellingerDistance
     template <typename Iterator1, typename Iterator2>
     ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType /*worst_dist*/ = -1) const
     {
+        //std::cout<<std::endl<<"operator () Hellinger Distance "<<std::endl;
         ResultType result = ResultType();
         ResultType diff0, diff1, diff2, diff3;
         Iterator1 last = a + size;
@@ -676,6 +690,7 @@ struct HellingerDistance
     template <typename U, typename V>
     inline ResultType accum_dist(const U& a, const V& b, int) const
     {
+        //std::cout<<std::endl<<"Hellinger Distance"<<std::endl;
         ResultType dist = sqrt(static_cast<ResultType>(a)) - sqrt(static_cast<ResultType>(b));
         return dist * dist;
     }
